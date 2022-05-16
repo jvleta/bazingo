@@ -1,0 +1,22 @@
+{
+  "name": "bazingo",
+  "version": "1.0.0",
+  "description": "bingo simulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvleta/bazingo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jvleta/bazingo/issues"
+  },
+  "homepage": "https://github.com/jvleta/bazingo#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
