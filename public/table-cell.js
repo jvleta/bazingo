@@ -10,7 +10,7 @@ export class TableCell extends LitElement {
       div {
         font-weight: bold;
         border-style: solid;
-        color: pizza;
+        color: black;
         padding: 1em;
       }
     `;
