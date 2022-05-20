@@ -35,7 +35,7 @@ main.innerHTML = "wooohooo";
   let history = '';
     for (let i = 0; i < draws.length; i++) {
     await sleep(3000);
-    history += `<p>Call: ${i + 1}, Ball ${draws[i]}</p>\n`;
+    history = `<p>Call: ${i + 1}, Ball ${draws[i]}</p>\n`;
     main.innerHTML = history;
   }
 })();
