@@ -35,6 +35,12 @@ main.innerHTML = "wooohooo";
   let history = '';
     for (let i = 0; i < draws.length; i++) {
     await sleep(3000);
+    const id = `${draws[i].toLowerCase()}`;
+
+    const tableCell = document.getElementById(id);
+    console.log(tableCell);
+    tableCell.style.backgroundColor = 'red';
+    console.log(id);
     history = `<p>Call: ${i + 1}, Ball ${draws[i]}</p>\n`;
     main.innerHTML = history;
   }
