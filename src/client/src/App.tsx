@@ -1,24 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import "./App.css";
+import CallerBoardRow from "./components/CallerBoardRow";
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <table>
+        <CallerBoardRow letter={"B"} start={1} stop={15} />
+        <CallerBoardRow letter={"I"} start={16} stop={30} />
+        <CallerBoardRow letter={"N"} start={31} stop={45} />
+        <CallerBoardRow letter={"G"} start={46} stop={60} />
+        <CallerBoardRow letter={"O"} start={61} stop={75} />
+      </table>
     </div>
   );
 }
