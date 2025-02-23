@@ -30,7 +30,7 @@ struct Square {
 };
 
 std::ostream &operator<<(std::ostream &os, const Square &square) {
-  os << square.display_value;
+  os << (square.is_daubed ? " *" : square.display_value);
   return os;
 }
 
@@ -43,7 +43,6 @@ struct Column {
   }
   Column(int min, int max) : Column(get_shuffled_integers(min, max, 5)) {}
   Square &operator[](size_t index) { return squares[index]; }
-
   const Square &operator[](size_t index) const { return squares[index]; }
 };
 
@@ -53,7 +52,29 @@ struct Card {
   Column n_squares{31, 45};
   Column g_squares{46, 60};
   Column o_squares{61, 75};
+  std::vector<Column *> columns{&b_squares, &i_squares, &n_squares, &g_squares,
+                                &o_squares};
   friend std::ostream &operator<<(std::ostream &os, const Card &card);
+  void update(int n) {
+    for (auto &column : columns) {
+      for (auto &square : column->squares) {
+        if (square.value == n) {
+          square.is_daubed = true;
+        }
+      }
+    }
+  }
+
+  bool is_a_winner() {
+    for (auto &column : columns) {
+      for (auto &square : column->squares) {
+        if (!square.is_daubed) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 };
 
 std::ostream &operator<<(std::ostream &os, const Card &card) {
@@ -67,7 +88,25 @@ std::ostream &operator<<(std::ostream &os, const Card &card) {
 }
 
 int main() {
-  std::cout << "hi mom!!!\n";
-  Card card{};
-  std::cout << card;
+  int num_wins = 0;
+  int num_sims = 100000;
+  for (int n = 0; n < num_sims; ++n) {
+    Card card{};
+    card.n_squares[2].is_daubed = true;
+    auto balls = get_shuffled_integers(1, 75, 75);
+    for (int i = 1; i <= 75; ++i) {
+      card.update(balls[i - 1]);
+      if (card.is_a_winner()) {
+        if (i < 58) {
+          ++num_wins;
+        }
+        break;
+      }
+    }
+  }
+  double prob_of_card_not_winning =
+      1.0 - static_cast<double>(num_wins) / static_cast<double>(num_sims);
+
+  double prob_of_no_players_winning = std::pow(prob_of_card_not_winning, 100);
+  std::cout << prob_of_no_players_winning;
 }
