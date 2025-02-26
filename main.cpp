@@ -46,6 +46,26 @@ struct Column {
   const Square &operator[](size_t index) const { return squares[index]; }
 };
 
+enum class Game {
+  WholeCardCovered,
+  Row1Covered,
+  Row2Covered,
+  Row3Covered,
+  Row4Covered,
+  Row5Covered,
+  AnyRowCovered,
+  BColumnCovered,
+  IColumnCovered,
+  NColumnCovered,
+  GColumnCovered,
+  OColumnCovered,
+  AnyColumnCovered,
+  LeftDiagonalCovered,
+  RightDiagonalCovered,
+  LetterX,
+  RotatingL
+};
+
 struct Card {
   Column b_squares{1, 15};
   Column i_squares{16, 30};
@@ -65,7 +85,48 @@ struct Card {
     }
   }
 
-  bool is_a_winner() {
+  bool is_a_winner(Game game) {
+    switch (game) {
+    case Game::WholeCardCovered:
+      return is_whole_card_covered();
+    case Game::Row1Covered:
+      return is_row_covered(0);
+    case Game::Row2Covered:
+      return is_row_covered(1);
+    case Game::Row3Covered:
+      return is_row_covered(2);
+    case Game::Row4Covered:
+      return is_row_covered(3);
+    case Game::Row5Covered:
+      return is_row_covered(4);
+    case Game::AnyRowCovered:
+      return is_any_row_covered();
+    case Game::BColumnCovered:
+      return is_column_covered(0);
+    case Game::IColumnCovered:
+      return is_column_covered(1);
+    case Game::NColumnCovered:
+      return is_column_covered(2);
+    case Game::GColumnCovered:
+      return is_column_covered(3);
+    case Game::OColumnCovered:
+      return is_column_covered(4);
+    case Game::AnyColumnCovered:
+      return is_any_column_covered();
+    case Game::LeftDiagonalCovered:
+      return is_left_diagonal_covered();
+    case Game::RightDiagonalCovered:
+      return is_right_diagonal_covered();
+    case Game::LetterX:
+      return is_letter_x_covered();
+    case Game::RotatingL:
+      return is_rotating_l_covered();
+    }
+    return true;
+  }
+
+private:
+  bool is_whole_card_covered() {
     for (auto &column : columns) {
       for (auto &square : column->squares) {
         if (!square.is_daubed) {
@@ -74,6 +135,65 @@ struct Card {
       }
     }
     return true;
+  }
+
+  bool is_row_covered(int n) {
+    for (auto &column : columns) {
+      if (!column->squares[n].is_daubed) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool is_column_covered(int n) {
+    for (auto &square : columns[n]->squares) {
+      if (!square.is_daubed) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  bool is_any_row_covered() {
+    for (int i = 0; i < 5; ++i) {
+      if (is_row_covered(i)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool is_any_column_covered() {
+    for (int i = 0; i < 5; ++i) {
+      if (is_column_covered(i)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool is_left_diagonal_covered() {
+    return b_squares[0].is_daubed && i_squares[1].is_daubed &&
+           n_squares[2].is_daubed && g_squares[3].is_daubed &&
+           o_squares[4].is_daubed;
+  };
+
+  bool is_right_diagonal_covered() {
+    return b_squares[4].is_daubed && i_squares[3].is_daubed &&
+           n_squares[2].is_daubed && g_squares[1].is_daubed &&
+           o_squares[0].is_daubed;
+  };
+
+  bool is_letter_x_covered() {
+    return is_left_diagonal_covered() && is_right_diagonal_covered();
+  };
+
+  bool is_rotating_l_covered() {
+    return (is_column_covered(0) && is_row_covered(4)) ||
+           (is_row_covered(4) && is_column_covered(4)) ||
+           (is_column_covered(4) && is_row_covered(0)) ||
+           (is_row_covered(0) && is_column_covered(0));
   }
 };
 
@@ -89,24 +209,21 @@ std::ostream &operator<<(std::ostream &os, const Card &card) {
 
 int main() {
   int num_wins = 0;
-  int num_sims = 100000;
+  int num_sims = 10000;
+  int min_number_of_calls = 75;
+
   for (int n = 0; n < num_sims; ++n) {
     Card card{};
     card.n_squares[2].is_daubed = true;
     auto balls = get_shuffled_integers(1, 75, 75);
-    for (int i = 1; i <= 75; ++i) {
+    for (int i = 1; i <= balls.size(); ++i) {
       card.update(balls[i - 1]);
-      if (card.is_a_winner()) {
-        if (i < 58) {
-          ++num_wins;
-        }
+      if (card.is_a_winner(Game::RotatingL)) {
+        std::cout << i << "\n";
+        min_number_of_calls = std::min(i, min_number_of_calls);
         break;
       }
     }
   }
-  double prob_of_card_not_winning =
-      1.0 - static_cast<double>(num_wins) / static_cast<double>(num_sims);
-
-  double prob_of_no_players_winning = std::pow(prob_of_card_not_winning, 100);
-  std::cout << prob_of_no_players_winning;
+  std::cout << min_number_of_calls << " \n";
 }
